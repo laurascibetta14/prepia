@@ -373,16 +373,74 @@ function DossierForm(props) {
   var sujet = aire === 'espagne' ? theme : aire === 'amerique' ? pays + ' — ' + (paysData ? paysData.th.split(',')[0] : '') : theme
   var c = getElvi(lv)
 
-  function go() {
+  function goDossier() {
     var angleStr = angle ? ' | Angle : "' + angle + '"' : ''
-    var prompt = 'Concours : ' + conc + ' ' + lv + ' | Sujet : "' + sujet + '"' + angleStr + '\n\n'
-    prompt += 'Génère un dossier de presse complet :\n\n'
-    prompt += 'ARTICLE 1 EN ESPAÑOL (' + (lv === 'LVA' ? '700-800' : '550-650') + ' mots) — Source gratuite (elDiario.es / La Jornada / El Mundo), datée 2024-2026.\n\n'
-    prompt += 'ARTICLE 2 EN ESPAÑOL (' + (lv === 'LVA' ? '650-750' : '500-600') + ' mots) — Angle différent, autre source.\n\n'
-    prompt += 'ARTICLE EN FRANÇAIS (~' + c.doc_fr + ' mots) — Style Le Monde. Extrait à traduire balisé [ ] (~' + c.theme + ' mots).\n\n'
-    prompt += 'PROBLÉMATIQUE (en español) : ¿En qué medida...?\n'
-    prompt += 'Q1 — Consigne résumé analytique comparatif (~' + c.resume + ' mots, en español)\n'
-    prompt += 'Q2 — Consigne essai argumenté (~' + c.essai + ' mots, en español)'
+    var wES1 = lv === 'LVA' ? '750-800' : '600-650'
+    var wES2 = lv === 'LVA' ? '700-750' : '550-600'
+    var prompt = 'Génère un sujet ELVI COMPLET format annales officielles. Concours : ' + conc + ' ' + lv + ' | Thème : "' + sujet + '"' + angleStr + '\n\n'
+    prompt += 'CONTRAINTES ABSOLUES :\n'
+    prompt += '- Sources datées entre 2025 et 2026 UNIQUEMENT\n'
+    prompt += '- Articles COMPLETS avec vrais paragraphes (pas de résumés ni de crochets indicatifs)\n'
+    prompt += '- Consignes Q1 et Q2 rédigées en español style officiel ELVI\n'
+    prompt += '- Format typographique exact comme ci-dessous\n\n'
+    prompt += '════════════════════════════════════\n'
+    prompt += 'BANQUE ELVI — ' + conc + ' — ESPAGNOL ' + lv + '\n'
+    prompt += 'SESSION 2026 | Thème : ' + sujet + '\n'
+    prompt += '════════════════════════════════════\n\n'
+    prompt += 'DOCUMENTO 1\n'
+    prompt += 'Título : [titre accrocheur en español]\n'
+    prompt += 'Autor : [prénom nom fictif]\n'
+    prompt += 'Fuente : [elDiario.es OU El País OU La Vanguardia OU El Mundo OU elconfidencial.com]\n'
+    prompt += 'Fecha : [date entre enero 2025 y abril 2026]\n\n'
+    prompt += '[Rédige ici l\'article COMPLET en español — exactement ' + wES1 + ' mots — style journalistique soutenu — vrais paragraphes développés — NE PAS résumer]\n\n'
+    prompt += '————————————————————————————————————\n\n'
+    prompt += 'DOCUMENTO 2\n'
+    prompt += 'Título : [titre différent, angle différent]\n'
+    prompt += 'Autor : [autre prénom nom fictif]\n'
+    prompt += 'Fuente : [source DIFFÉRENTE du doc 1 — elDiario.es OU El País OU infoLibre OU La Jornada OU El Periódico]\n'
+    prompt += 'Fecha : [date entre enero 2025 y abril 2026]\n\n'
+    prompt += '[Rédige ici l\'article COMPLET en español — exactement ' + wES2 + ' mots — angle et perspective DIFFÉRENTS du doc 1 — vrais paragraphes]\n\n'
+    prompt += '————————————————————————————————————\n\n'
+    prompt += 'DOCUMENTO 3\n'
+    prompt += 'Título : [titre en français]\n'
+    prompt += 'Autor : [prénom nom fictif]\n'
+    prompt += 'Fuente : [Le Monde OU Le Figaro OU Libération OU L\'Obs OU Le Point]\n'
+    prompt += 'Fecha : [date entre janvier 2025 et avril 2026]\n\n'
+    prompt += '[Rédige ici l\'article COMPLET en français — exactement ' + c.doc_fr + ' mots — style journalistique. Indique entre crochets [ ] l\'extrait à traduire : ~' + c.theme + ' mots consécutifs dans le texte]\n\n'
+    prompt += '════════════════════════════════════\n'
+    prompt += 'PREGUNTAS\n'
+    prompt += '════════════════════════════════════\n\n'
+    prompt += 'PREGUNTA 1 — Resumen analítico comparativo (' + c.resume + ' palabras)\n'
+    prompt += '¿Cómo se presentan [aspect central du thème] en los documentos 1 y 2? Redacte un resumen analítico comparativo de ' + c.resume + ' palabras.\n\n'
+    prompt += 'PREGUNTA 2 — Ensayo argumentado (' + c.essai + ' palabras)\n'
+    prompt += '¿Le parece que [question problématisée sur le thème]? Conteste teniendo en cuenta todos los documentos del dosier y apoyándose en su reflexión y en sus conocimientos personales. (' + c.essai + ' palabras)\n\n'
+    prompt += 'PREGUNTA 3 — Traducción (tema)\n'
+    prompt += 'Traduzca al español el fragmento del documento 3 entre corchetes [ ] (~' + c.theme + ' palabras).'
+    run(SYS_BASE, prompt)
+  }
+
+  function goCorrige() {
+    var prompt = 'Génère les CORRIGÉS OFFICIELS complets pour un sujet ELVI. Concours : ' + conc + ' ' + lv + ' | Thème : "' + sujet + '"\n\n'
+    prompt += '════════════════════════════════════\n'
+    prompt += 'CORRIGÉS PROFESSEUR — ELVI ' + lv + ' — ' + conc + '\n'
+    prompt += '════════════════════════════════════\n\n'
+    prompt += 'CORRIGÉ Q1 — Resumen analítico comparativo (' + c.resume + ' palabras)\n\n'
+    prompt += 'Rédige en español un corrigé-type COMPLET :\n'
+    prompt += '- Introduction : idée directrice commune aux deux documents + annonce des divergences\n'
+    prompt += '- Développement : 2-3 points articulés avec références précises aux doc 1 et doc 2\n'
+    prompt += '- Conclusion : synthèse comparative\n'
+    prompt += 'Respecter EXACTEMENT ' + c.resume + ' mots. Rédige le texte complet.\n\n'
+    prompt += '————————————————————————————————————\n\n'
+    prompt += 'CORRIGÉ Q2 — Ensayo argumentado (' + c.essai + ' palabras)\n\n'
+    prompt += 'Rédige en español un corrigé-type COMPLET :\n'
+    prompt += '- Introduction avec problématique et annonce du plan\n'
+    prompt += '- 2 parties avec sous-parties, exemples des documents ET exemples personnels de civilisation hispanique\n'
+    prompt += '- Conclusion\n'
+    prompt += 'Respecter EXACTEMENT ' + c.essai + ' mots. Rédige le texte complet.\n\n'
+    prompt += '————————————————————————————————————\n\n'
+    prompt += 'CORRIGÉ Q3 — Traducción thème (~' + c.theme + ' mots)\n\n'
+    prompt += 'Propose une traduction de référence en español soutenu niveau ' + lv + '.\n'
+    prompt += 'Puis : 5 points de grammaire clés avec exemples tirés de la traduction (subjonctif, ser/estar, temps du passé, concordance, registre).'
     run(SYS_BASE, prompt)
   }
 
@@ -397,10 +455,12 @@ function DossierForm(props) {
       <Label label="Concours"><ChipGroup vals={['ELVI/BCE', 'Ecricome']} active={conc} set={setConc} color={color} /></Label>
       <Label label="Angle précis (optionnel)"><InputField value={angle} onChange={setAngle} placeholder="Ex : rôle des femmes, dimension économique…" /></Label>
       <InfoBadge color={color}>📏 {lv} · docs ES {c.doc_es} mots · doc FR {c.doc_fr} · résumé {c.resume} · essai {c.essai}</InfoBadge>
-      <GoButton onClick={go} busy={busy} color={color}>📰 Générer le dossier</GoButton>
+      <GoButton onClick={goDossier} busy={busy} color={color}>📰 Générer le dossier ELVI</GoButton>
+      <GoButton onClick={goCorrige} busy={busy} color="#2D6A4F">✅ Générer les corrigés Q1+Q2+Q3</GoButton>
     </div>
   )
 }
+
 
 // ── Module 2 — Traduction ─────────────────────────────────────────
 var TTABS = [
